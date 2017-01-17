@@ -18,7 +18,6 @@ $text_mode_buttons_editor = new Text_Mode_Buttons_Editor();
 class Text_Mode_Buttons_Editor {
 
 	var $page_name;
-	var $td = 'tmbe'; // text domain
 
 	function __construct() {
 		add_action( 'admin_footer-post.php', array( &$this, 'post_js' ) );
@@ -99,13 +98,13 @@ class Text_Mode_Buttons_Editor {
 		register_setting( 'tmbe-group', 'tmbe-buttons-add', array( &$this, 'sanitize_add' ) );
 		register_setting( 'tmbe-group', 'tmbe-buttons-remove', array( &$this, 'sanitize_remove' ) );
 
-		add_settings_section( 'tmbe-section-add', __( 'Add New Buttons', $this->td ), function() { echo ''; }, $this->page_name );
-		// $new_btn = get_submit_button( __( 'Add', $this->td ), 'small', 'tmbe-add', false );
+		add_settings_section( 'tmbe-section-add', __( 'Add New Buttons', 'tmbe' ), function() { echo ''; }, $this->page_name );
+		// $new_btn = get_submit_button( __( 'Add', 'tmbe' ), 'small', 'tmbe-add', false );
 		$new_btn = '';
-		add_settings_field( 'tmbe-image-row', __( 'Buttons:', $this->td ) . "<br />$new_btn", array( &$this, 'field' ), $this->page_name, 'tmbe-section-add', get_option( 'tmbe-buttons-add', false ) );
+		add_settings_field( 'tmbe-image-row', __( 'Buttons:', 'tmbe' ) . "<br />$new_btn", array( &$this, 'field' ), $this->page_name, 'tmbe-section-add', get_option( 'tmbe-buttons-add', false ) );
 
-		add_settings_section( 'tmbe-section-remove', __( 'Remove Buttons', $this->td ), function() { echo ''; }, $this->page_name );
-		add_settings_field( 'tmbe-image-row', __( '', $this->td ), array( &$this, 'field_remove' ), $this->page_name, 'tmbe-section-remove', get_option( 'tmbe-buttons-remove', false ) );
+		add_settings_section( 'tmbe-section-remove', __( 'Remove Buttons', 'tmbe' ), function() { echo ''; }, $this->page_name );
+		add_settings_field( 'tmbe-image-row', __( '', 'tmbe' ), array( &$this, 'field_remove' ), $this->page_name, 'tmbe-section-remove', get_option( 'tmbe-buttons-remove', false ) );
 	}
 
 	function sanitize_add( $input ) {
@@ -145,7 +144,7 @@ class Text_Mode_Buttons_Editor {
 		echo '<span id="tmbe-row-flag"></span>'; //helps with inserting new row via js
 
 		// change type to 'button' so [enter] from an input doesn't create a new row
-		$btn = str_replace( 'type="submit"', 'type="button"', get_submit_button( __( 'Add', $this->td ), 'small', 'tmbe-add', false ) );
+		$btn = str_replace( 'type="submit"', 'type="button"', get_submit_button( __( 'Add', 'tmbe' ), 'small', 'tmbe-add', false ) );
 		echo $btn;
 	}
 
@@ -160,7 +159,7 @@ class Text_Mode_Buttons_Editor {
 				"<input type='text' name='tmbe-buttons-add[{$key_id}][caption]' value='{$values['caption']}' placeholder='caption' />".
 				"<input type='text' name='tmbe-buttons-add[{$key_id}][before]' value='{$values['before']}' placeholder='before' />".
 				"<input type='text' name='tmbe-buttons-add[{$key_id}][after]' value='{$values['after']}' placeholder='after' />".
-				" <a href='#' class='hide-if-no-js tmbe-delete'>". __( 'Delete', $this->td ) . "</a>".
+				" <a href='#' class='hide-if-no-js tmbe-delete'>". __( 'Delete', 'tmbe' ) . "</a>".
 				"</p>";
 		return $html;
 	}
@@ -178,19 +177,19 @@ class Text_Mode_Buttons_Editor {
 	}
 
 	function menu() {
-		$this->page_name = add_options_page( __( 'Editor Buttons', $this->td ), __( 'Editor Buttons', $this->td ), 'edit_posts', __CLASS__, array( &$this, 'page' ) );
+		$this->page_name = add_options_page( __( 'Editor Buttons', 'tmbe' ), __( 'Editor Buttons', 'tmbe' ), 'edit_posts', __CLASS__, array( &$this, 'page' ) );
 	}
 
 	function page() {
 		add_action( 'admin_footer', array( &$this, 'admin_footer' ) );
 		?><div class="wrap">
-		<h2><?php _e( 'Text Mode Buttons Editor', $this->td ); ?></h2>
+		<h2><?php _e( 'Text Mode Buttons Editor', 'tmbe' ); ?></h2>
 
 		<?php if ( count( get_option( 'peb_caption', array() ) ) > 0 ) {
 			if ( ! get_option( 'tmbe-ignore-import', false ) ) { ?>
 			<form method="post">
-			<h3><?php _e( 'Import from Post Editor Buttons (Fork)', $this->td ); ?></h3>
-			<p><?php _e( 'Looks like you have some buttons from Post Editor Buttons, would you like to import?', $this->td ); ?></p>
+			<h3><?php _e( 'Import from Post Editor Buttons (Fork)', 'tmbe' ); ?></h3>
+			<p><?php _e( 'Looks like you have some buttons from Post Editor Buttons, would you like to import?', 'tmbe' ); ?></p>
 			<?php
 				$caption = get_option('peb_caption', array() );
 				$before = get_option('peb_before', array() );
@@ -209,25 +208,25 @@ class Text_Mode_Buttons_Editor {
 				foreach( $rem as $r ) {
 					echo "<input type='hidden' name='tmbe-buttons-remove-import[]' value='$r' />";
 				}
-				echo __( 'Remove: ', $this->td ) . implode( ', ', $rem );
+				echo __( 'Remove: ', 'tmbe' ) . implode( ', ', $rem );
 				echo '</td></tr>';
 				echo '</table>';
 
 				echo '<p><input type="hidden" name="tmbe-import-peb" />';
-				submit_button( __( 'Import &amp; Delete', $this->td ), 'primary', 'tmbe-import', false );
+				submit_button( __( 'Import &amp; Delete', 'tmbe' ), 'primary', 'tmbe-import', false );
 				echo ' ';
-				submit_button( __( 'Import &amp; Keep', $this->td ), 'secondary', 'tmbe-import2', false );
+				submit_button( __( 'Import &amp; Keep', 'tmbe' ), 'secondary', 'tmbe-import2', false );
 				echo ' ';
-				submit_button( __( 'Ignore', $this->td ), 'secondary', 'tmbe-ignore', false );
+				submit_button( __( 'Ignore', 'tmbe' ), 'secondary', 'tmbe-ignore', false );
 				echo ' ';
-				submit_button( __( 'Delete', $this->td ), 'small', 'tmbe-delete', false );
+				submit_button( __( 'Delete', 'tmbe' ), 'small', 'tmbe-delete', false );
 				echo '</p>';
 			?>
 			</form>
 		<?php } else { ?>
 			<form method="post">
 			<p>Looks like you have some buttons from Post Editor Buttons, would you like to import?
-			<?php submit_button( __('Review', $this->td ), 'small', 'tmbe-review', false ); ?></p>
+			<?php submit_button( __('Review', 'tmbe' ), 'small', 'tmbe-review', false ); ?></p>
 			</form>
 		<?php }
 		} ?>
@@ -237,9 +236,9 @@ class Text_Mode_Buttons_Editor {
 			settings_fields( 'tmbe-group' );
 			do_settings_sections( $this->page_name );
 			echo '<p>';
-			submit_button( __( 'Save', $this->td ), 'primary', 'tmbe-submit', false );
+			submit_button( __( 'Save', 'tmbe' ), 'primary', 'tmbe-submit', false );
 			echo ' ';
-			// submit_button( __( 'Add', $this->td ), 'small', 'tmbe-add', false );
+			// submit_button( __( 'Add', 'tmbe' ), 'small', 'tmbe-add', false );
 			echo '</p>';
 		?>
 		</form>
@@ -276,10 +275,10 @@ class Text_Mode_Buttons_Editor {
 	function contextual_help( $old, $id, $object ) {
 		if ( $id != $this->page_name ) return $old;
 		$help_text = '';
-		$help_text .= '<p>'. __( 'Captions must be unique', $this->td ) .'</p>';
+		$help_text .= '<p>'. __( 'Captions must be unique', 'tmbe' ) .'</p>';
 		$object->add_help_tab( array(
 			'id' => 'tmbe-help',
-			'title' => __( 'Overview', $this->td ),
+			'title' => __( 'Overview', 'tmbe' ),
 			'content' => $help_text
 		) );
 	}
