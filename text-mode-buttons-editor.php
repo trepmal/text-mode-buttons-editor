@@ -19,6 +19,9 @@ class Text_Mode_Buttons_Editor {
 
 	var $page_name;
 
+	/**
+	 *
+	 */
 	function __construct() {
 		add_action( 'admin_footer-post.php',     array( $this, 'post_js' ) );
 		add_action( 'admin_footer-post-new.php', array( $this, 'post_js' ) );
@@ -28,6 +31,9 @@ class Text_Mode_Buttons_Editor {
 		add_action( 'wp_ajax_tmbe_get_new_row',  array( $this, 'get_new_row_cb' ) );
 	}
 
+	/**
+	 *
+	 */
 	function post_js( $hook ) {
 		global $hook_suffix;
 		if ( 'post.php' != $hook_suffix && 'post-new.php' != $hook_suffix ) {
@@ -58,11 +64,17 @@ class Text_Mode_Buttons_Editor {
 		<?php
 	}
 
+	/**
+	 *
+	 */
 	function _quote_wrap( $input ) {
 		$input = addslashes( $input );
 		return "'$input'";
 	}
 
+	/**
+	 *
+	 */
 	function _delete_peb() {
 		delete_option( 'peb_caption' );
 		delete_option( 'peb_before' );
@@ -70,6 +82,9 @@ class Text_Mode_Buttons_Editor {
 		delete_option( 'peb_remove' );
 	}
 
+	/**
+	 *
+	 */
 	function _import_peb( $type, $peb_buttons ) {
 		if ( $type != 'add' && $type != 'remove' ) {
 			return;
@@ -80,6 +95,9 @@ class Text_Mode_Buttons_Editor {
 		update_option( 'tmbe-buttons-'.$type, $buttons );
 	}
 
+	/**
+	 *
+	 */
 	function init() {
 		if ( isset( $_POST['tmbe-review'] ) ) {
 			delete_option( 'tmbe-ignore-import' );
@@ -113,12 +131,17 @@ class Text_Mode_Buttons_Editor {
 		add_settings_field( 'tmbe-image-row', __( '', 'tmbe' ), array( $this, 'field_remove' ), $this->page_name, 'tmbe-section-remove', get_option( 'tmbe-buttons-remove', false ) );
 	}
 
+	/**
+	 *
+	 */
 	function sanitize_add( $input ) {
 		$newinput = array();
 		foreach ( $input as $k => $deets ) {
 
-			// @todo remove extract()
-			extract( array_map( 'trim', $deets ) );
+			$deets   = array_map( 'trim', $deets );
+			$caption = $deets['caption'];
+			$before  = $deets['before'];
+			$after   = $deets['after'];
 
 			if ( empty( $caption ) || empty( $before ) ) {
 				unset( $input[ $k ] ); continue;
@@ -136,10 +159,16 @@ class Text_Mode_Buttons_Editor {
 		return $newinput;
 	}
 
+	/**
+	 *
+	 */
 	function sanitize_remove( $input ) {
 		return $input;
 	}
 
+	/**
+	 *
+	 */
 	function field( $args ) {
 		// saved fields
 		if ( $args != false ) {
@@ -157,6 +186,9 @@ class Text_Mode_Buttons_Editor {
 		echo $btn;
 	}
 
+	/**
+	 *
+	 */
 	function __fields( $values=array(), $key_id='blah' ) {
 		$defaults = array(
 			'caption' => '',
@@ -177,6 +209,9 @@ class Text_Mode_Buttons_Editor {
 		return $html;
 	}
 
+	/**
+	 *
+	 */
 	function field_remove( $args ) {
 
 		$core_buttons = array(
@@ -185,16 +220,22 @@ class Text_Mode_Buttons_Editor {
 		);
 		echo '<input type="hidden" name="tmbe-buttons-remove[]" value="" />';
 		foreach ( $core_buttons as $btn ) {
-			$c = in_array( $btn, (array) $args ) ? ' checked="checked"' : '';
+			$c = checked( in_array( $btn, (array) $args ), true, false );
 			echo "<label style='width:31%; margin: 0 1%; float:left;'><input type='checkbox' name='tmbe-buttons-remove[]' value='$btn'$c /> $btn</label>";
 		}
 
 	}
 
+	/**
+	 *
+	 */
 	function menu() {
 		$this->page_name = add_options_page( __( 'Editor Buttons', 'tmbe' ), __( 'Editor Buttons', 'tmbe' ), 'edit_posts', __CLASS__, array( $this, 'page' ) );
 	}
 
+	/**
+	 *
+	 */
 	function page() {
 		add_action( 'admin_footer', array( $this, 'admin_footer' ) );
 		?><div class="wrap">
@@ -207,8 +248,8 @@ class Text_Mode_Buttons_Editor {
 			<p><?php _e( 'Looks like you have some buttons from Post Editor Buttons, would you like to import?', 'tmbe' ); ?></p>
 			<?php
 				$caption = get_option('peb_caption', array() );
-				$before = get_option('peb_before', array() );
-				$after = get_option('peb_after', array() );
+				$before  = get_option('peb_before', array() );
+				$after   = get_option('peb_after', array() );
 				echo '<table>';
 				for ( $i = 0; $i < count( $caption ); $i++ ) {
 					$uid = uniqid() . $i;
@@ -240,8 +281,10 @@ class Text_Mode_Buttons_Editor {
 			</form>
 		<?php } else { ?>
 			<form method="post">
-			<p>Looks like you have some buttons from Post Editor Buttons, would you like to import?
-			<?php submit_button( __('Review', 'tmbe' ), 'small', 'tmbe-review', false ); ?></p>
+			<p>
+			<?php _e( 'Looks like you have some buttons from Post Editor Buttons, would you like to import?', 'tmbe' ); ?>
+			<?php submit_button( __('Review', 'tmbe' ), 'small', 'tmbe-review', false ); ?>
+			</p>
 			</form>
 		<?php }
 		} ?>
@@ -252,14 +295,15 @@ class Text_Mode_Buttons_Editor {
 			do_settings_sections( $this->page_name );
 			echo '<p>';
 			submit_button( __( 'Save', 'tmbe' ), 'primary', 'tmbe-submit', false );
-			echo ' ';
-			// submit_button( __( 'Add', 'tmbe' ), 'small', 'tmbe-add', false );
 			echo '</p>';
 		?>
 		</form>
 		</div><?php
 	}
 
+	/**
+	 *
+	 */
 	function admin_footer() {
 		?><script>
 		jQuery(document).ready(function($){
@@ -287,6 +331,9 @@ class Text_Mode_Buttons_Editor {
 		</script><?php
 	}
 
+	/**
+	 *
+	 */
 	function contextual_help( $old, $id, $object ) {
 		if ( $id != $this->page_name ) {
 			return $old;
@@ -300,6 +347,9 @@ class Text_Mode_Buttons_Editor {
 		) );
 	}
 
+	/**
+	 *
+	 */
 	function get_new_row_cb() {
 		if ( check_ajax_referer( 'tmbe-new-row', 'nonce' ) ) {
 			die( $this->__fields( array(), uniqid() ) );
