@@ -20,12 +20,12 @@ class Text_Mode_Buttons_Editor {
 	var $page_name;
 
 	function __construct() {
-		add_action( 'admin_footer-post.php', array( &$this, 'post_js' ) );
-		add_action( 'admin_footer-post-new.php', array( &$this, 'post_js' ) );
-		add_action( 'admin_init', array( &$this, 'init' ) );
-		add_action( 'admin_menu', array( &$this, 'menu' ) );
-		add_filter( 'contextual_help', array( &$this, 'contextual_help' ), 10, 3 );
-		add_action( 'wp_ajax_tmbe_get_new_row', array( &$this, 'get_new_row_cb' ) );
+		add_action( 'admin_footer-post.php',     array( $this, 'post_js' ) );
+		add_action( 'admin_footer-post-new.php', array( $this, 'post_js' ) );
+		add_action( 'admin_init',                array( $this, 'init' ) );
+		add_action( 'admin_menu',                array( $this, 'menu' ) );
+		add_filter( 'contextual_help',           array( $this, 'contextual_help' ), 10, 3 );
+		add_action( 'wp_ajax_tmbe_get_new_row',  array( $this, 'get_new_row_cb' ) );
 	}
 
 	function post_js( $hook ) {
@@ -95,16 +95,16 @@ class Text_Mode_Buttons_Editor {
 			}
 		}
 
-		register_setting( 'tmbe-group', 'tmbe-buttons-add', array( &$this, 'sanitize_add' ) );
-		register_setting( 'tmbe-group', 'tmbe-buttons-remove', array( &$this, 'sanitize_remove' ) );
+		register_setting( 'tmbe-group', 'tmbe-buttons-add', array( $this, 'sanitize_add' ) );
+		register_setting( 'tmbe-group', 'tmbe-buttons-remove', array( $this, 'sanitize_remove' ) );
 
 		add_settings_section( 'tmbe-section-add', __( 'Add New Buttons', 'tmbe' ), function() { echo ''; }, $this->page_name );
 		// $new_btn = get_submit_button( __( 'Add', 'tmbe' ), 'small', 'tmbe-add', false );
 		$new_btn = '';
-		add_settings_field( 'tmbe-image-row', __( 'Buttons:', 'tmbe' ) . "<br />$new_btn", array( &$this, 'field' ), $this->page_name, 'tmbe-section-add', get_option( 'tmbe-buttons-add', false ) );
+		add_settings_field( 'tmbe-image-row', __( 'Buttons:', 'tmbe' ) . "<br />$new_btn", array( $this, 'field' ), $this->page_name, 'tmbe-section-add', get_option( 'tmbe-buttons-add', false ) );
 
 		add_settings_section( 'tmbe-section-remove', __( 'Remove Buttons', 'tmbe' ), function() { echo ''; }, $this->page_name );
-		add_settings_field( 'tmbe-image-row', __( '', 'tmbe' ), array( &$this, 'field_remove' ), $this->page_name, 'tmbe-section-remove', get_option( 'tmbe-buttons-remove', false ) );
+		add_settings_field( 'tmbe-image-row', __( '', 'tmbe' ), array( $this, 'field_remove' ), $this->page_name, 'tmbe-section-remove', get_option( 'tmbe-buttons-remove', false ) );
 	}
 
 	function sanitize_add( $input ) {
@@ -177,11 +177,11 @@ class Text_Mode_Buttons_Editor {
 	}
 
 	function menu() {
-		$this->page_name = add_options_page( __( 'Editor Buttons', 'tmbe' ), __( 'Editor Buttons', 'tmbe' ), 'edit_posts', __CLASS__, array( &$this, 'page' ) );
+		$this->page_name = add_options_page( __( 'Editor Buttons', 'tmbe' ), __( 'Editor Buttons', 'tmbe' ), 'edit_posts', __CLASS__, array( $this, 'page' ) );
 	}
 
 	function page() {
-		add_action( 'admin_footer', array( &$this, 'admin_footer' ) );
+		add_action( 'admin_footer', array( $this, 'admin_footer' ) );
 		?><div class="wrap">
 		<h2><?php _e( 'Text Mode Buttons Editor', 'tmbe' ); ?></h2>
 
