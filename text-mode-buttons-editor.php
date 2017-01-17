@@ -30,12 +30,14 @@ class Text_Mode_Buttons_Editor {
 
 	function post_js( $hook ) {
 		global $hook_suffix;
-		if ( 'post.php' != $hook_suffix && 'post-new.php' != $hook_suffix ) return;
+		if ( 'post.php' != $hook_suffix && 'post-new.php' != $hook_suffix ) {
+			return;
+		}
 
 		?><script type="text/javascript">
 		<?php
 			$buttons = get_option( 'tmbe-buttons-add', array() );
-			foreach ($buttons as $id => $deets ) {
+			foreach ( $buttons as $id => $deets ) {
 				$a = array_map( array( $this, '_quote_wrap' ), $deets );
 				$v = implode( ', ', $a );
 				echo "QTags.addButton('tmbe_$id', $v);\n";
@@ -55,6 +57,7 @@ class Text_Mode_Buttons_Editor {
 		</script>
 		<?php
 	}
+
 	function _quote_wrap( $input ) {
 		$input = addslashes( $input );
 		return "'$input'";
@@ -66,11 +69,14 @@ class Text_Mode_Buttons_Editor {
 		delete_option( 'peb_after' );
 		delete_option( 'peb_remove' );
 	}
+
 	function _import_peb( $type, $peb_buttons ) {
-		if ( $type != 'add' && $type != 'remove' ) return;
+		if ( $type != 'add' && $type != 'remove' ) {
+			return;
+		}
 
 		$existing = get_option( 'tmbe-buttons-'.$type );
-		$buttons = array_merge( $existing, $peb_buttons );
+		$buttons  = array_merge( $existing, $peb_buttons );
 		update_option( 'tmbe-buttons-'.$type, $buttons );
 	}
 
@@ -78,6 +84,7 @@ class Text_Mode_Buttons_Editor {
 		if ( isset( $_POST['tmbe-review'] ) ) {
 			delete_option( 'tmbe-ignore-import' );
 		}
+
 		if ( isset( $_POST['tmbe-import-peb'] ) ) {
 			$new_buttons = $this->sanitize_add( $_POST['tmbe-buttons-add-import'] );
 			$del_buttons = $_POST['tmbe-buttons-remove-import'];
@@ -95,22 +102,22 @@ class Text_Mode_Buttons_Editor {
 			}
 		}
 
-		register_setting( 'tmbe-group', 'tmbe-buttons-add', array( $this, 'sanitize_add' ) );
+		register_setting( 'tmbe-group', 'tmbe-buttons-add',    array( $this, 'sanitize_add' ) );
 		register_setting( 'tmbe-group', 'tmbe-buttons-remove', array( $this, 'sanitize_remove' ) );
 
-		add_settings_section( 'tmbe-section-add', __( 'Add New Buttons', 'tmbe' ), function() { echo ''; }, $this->page_name );
-		// $new_btn = get_submit_button( __( 'Add', 'tmbe' ), 'small', 'tmbe-add', false );
-		$new_btn = '';
-		add_settings_field( 'tmbe-image-row', __( 'Buttons:', 'tmbe' ) . "<br />$new_btn", array( $this, 'field' ), $this->page_name, 'tmbe-section-add', get_option( 'tmbe-buttons-add', false ) );
+		add_settings_section( 'tmbe-section-add', __( 'Add New Buttons', 'tmbe' ), '__return_empty_string', $this->page_name );
 
-		add_settings_section( 'tmbe-section-remove', __( 'Remove Buttons', 'tmbe' ), function() { echo ''; }, $this->page_name );
+		add_settings_field( 'tmbe-image-row', __( 'Buttons:', 'tmbe' ), array( $this, 'field' ), $this->page_name, 'tmbe-section-add', get_option( 'tmbe-buttons-add', false ) );
+
+		add_settings_section( 'tmbe-section-remove', __( 'Remove Buttons', 'tmbe' ), '__return_empty_string', $this->page_name );
 		add_settings_field( 'tmbe-image-row', __( '', 'tmbe' ), array( $this, 'field_remove' ), $this->page_name, 'tmbe-section-remove', get_option( 'tmbe-buttons-remove', false ) );
 	}
 
 	function sanitize_add( $input ) {
 		$newinput = array();
-		foreach( $input as $k => $deets ) {
+		foreach ( $input as $k => $deets ) {
 
+			// @todo remove extract()
 			extract( array_map( 'trim', $deets ) );
 
 			if ( empty( $caption ) || empty( $before ) ) {
@@ -118,8 +125,8 @@ class Text_Mode_Buttons_Editor {
 			}
 
 			$caption = sanitize_title( $caption );
-			$before = stripslashes( wp_filter_post_kses( $before ) );
-			$after = stripslashes( wp_filter_post_kses( $after ) );
+			$before  = stripslashes( wp_filter_post_kses( $before ) );
+			$after   = stripslashes( wp_filter_post_kses( $after ) );
 
 
 			unset( $input[ $k ] );
@@ -132,11 +139,13 @@ class Text_Mode_Buttons_Editor {
 	function sanitize_remove( $input ) {
 		return $input;
 	}
+
 	function field( $args ) {
 		// saved fields
-		// print_r( $args );
-		if ( $args != false ) foreach( $args as $id => $params ) {
-			echo $this->__fields( $params, $id );
+		if ( $args != false ) {
+			foreach ( $args as $id => $params ) {
+				echo $this->__fields( $params, $id );
+			}
 		}
 		// empty set for new
 		echo $this->__fields();
@@ -149,7 +158,11 @@ class Text_Mode_Buttons_Editor {
 	}
 
 	function __fields( $values=array(), $key_id='blah' ) {
-		$defaults = array( 'caption' => '', 'before' => '', 'after' => '');
+		$defaults = array(
+			'caption' => '',
+			'before'  => '',
+			'after'   => '',
+		);
 		$values = wp_parse_args( $values, $defaults );
 
 		$values = array_map( 'stripslashes', $values );
@@ -165,11 +178,13 @@ class Text_Mode_Buttons_Editor {
 	}
 
 	function field_remove( $args ) {
-		// print_r( $args );
 
-		$core_buttons = array( 'strong', 'em', 'link', 'block', 'del', 'ins', 'img', 'ul', 'ol', 'li', 'code', 'more', 'spell', 'close' );
+		$core_buttons = array(
+			'strong', 'em', 'link', 'block', 'del', 'ins','img',
+			'ul', 'ol', 'li', 'code', 'more', 'spell', 'close'
+		);
 		echo '<input type="hidden" name="tmbe-buttons-remove[]" value="" />';
-		foreach( $core_buttons as $btn ) {
+		foreach ( $core_buttons as $btn ) {
 			$c = in_array( $btn, (array) $args ) ? ' checked="checked"' : '';
 			echo "<label style='width:31%; margin: 0 1%; float:left;'><input type='checkbox' name='tmbe-buttons-remove[]' value='$btn'$c /> $btn</label>";
 		}
@@ -205,7 +220,7 @@ class Text_Mode_Buttons_Editor {
 				}
 				echo '<tr><td colspan="3">';
 				$rem = array_filter( get_option( 'peb_remove', array() ) );
-				foreach( $rem as $r ) {
+				foreach ( $rem as $r ) {
 					echo "<input type='hidden' name='tmbe-buttons-remove-import[]' value='$r' />";
 				}
 				echo __( 'Remove: ', 'tmbe' ) . implode( ', ', $rem );
@@ -273,19 +288,22 @@ class Text_Mode_Buttons_Editor {
 	}
 
 	function contextual_help( $old, $id, $object ) {
-		if ( $id != $this->page_name ) return $old;
-		$help_text = '';
+		if ( $id != $this->page_name ) {
+			return $old;
+		}
+		$help_text  = '';
 		$help_text .= '<p>'. __( 'Captions must be unique', 'tmbe' ) .'</p>';
 		$object->add_help_tab( array(
-			'id' => 'tmbe-help',
-			'title' => __( 'Overview', 'tmbe' ),
-			'content' => $help_text
+			'id'      => 'tmbe-help',
+			'title'   => __( 'Overview', 'tmbe' ),
+			'content' => $help_text,
 		) );
 	}
 
 	function get_new_row_cb() {
-		if ( check_ajax_referer( 'tmbe-new-row', 'nonce' ) )
+		if ( check_ajax_referer( 'tmbe-new-row', 'nonce' ) ) {
 			die( $this->__fields( array(), uniqid() ) );
+		}
 	}
 
 }
